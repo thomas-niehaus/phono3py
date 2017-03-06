@@ -71,25 +71,25 @@ def get_fc3(supercell,
                    disp_dataset,
                    symmetry,
                    verbose=verbose)
+        if is_permutation_symmetry:
+            if verbose:
+                print("Imposing index permulation symmetry to fc3")
+            set_permutation_symmetry_fc3(fc3)
         if translational_symmetry_type:
             if verbose:
                 print("Imposing translational invariance symmetry to fc3")
             set_translational_invariance_fc3(
                 fc3, translational_symmetry_type=translational_symmetry_type)
+    else:
         if is_permutation_symmetry:
             if verbose:
                 print("Imposing index permulation symmetry to fc3")
             set_permutation_symmetry_fc3(fc3)
-    else:
         if translational_symmetry_type:
             if verbose:
                 print("Imposing translational invariance symmetry to fc3")
-            set_translational_invariance_fc3_per_index(
+            set_translational_invariance_fc3(
                 fc3, translational_symmetry_type=translational_symmetry_type)
-        if is_permutation_symmetry:
-            if verbose:
-                print("Imposing index permulation symmetry to fc3")
-            set_permutation_symmetry_fc3(fc3)
 
     return fc3
 
@@ -207,48 +207,10 @@ def set_permutation_symmetry_fc3_elem(fc3, a, b, c, divisor=6):
     return tensor3
 
 def set_translational_invariance_fc3(fc3,
-                                     translational_symmetry_type=1):
-    for i in range(3):
-        set_translational_invariance_fc3_per_index(
-            fc3,
-            index=i,
-            translational_symmetry_type=translational_symmetry_type)
-
-def set_translational_invariance_fc3_per_index(fc3,
-                                               index=0,
-                                               translational_symmetry_type=1):
-    for i in range(fc3.shape[(1 + index) % 3]):
-        for j in range(fc3.shape[(2 + index) % 3]):
-            for k, l, m in list(np.ndindex(3, 3, 3)):
-                if translational_symmetry_type == 2: # Type 2
-                    if index == 0:
-                        fc_abs = np.abs(fc3[:, i, j, k, l, m])
-                        fc_sum = np.sum(fc3[:, i, j, k, l, m])
-                        fc_abs_sum = np.sum(fc_abs)
-                        fc3[:, i, j, k, l, m] -= (
-                            fc_sum / fc_abs_sum * fc_abs)
-                    elif index == 1:
-                        fc_abs = np.abs(fc3[i, :, j, k, l, m])
-                        fc_sum = np.sum(fc3[i, :, j, k, l, m])
-                        fc_abs_sum = np.sum(fc_abs)
-                        fc3[i, :, j, k, l, m] -= (
-                            fc_sum / fc_abs_sum * fc_abs)
-                    elif index == 2:
-                        fc_abs = np.abs(fc3[i, j, :, k, l, m])
-                        fc_sum = np.sum(fc3[i, j, :, k, l, m])
-                        fc_abs_sum = np.sum(fc_abs)
-                        fc3[i, j, :, k, l, m] -= (
-                            fc_sum / fc_abs_sum * fc_abs)
-                else: # Type 1
-                    if index == 0:
-                        fc3[:, i, j, k, l, m] -= np.sum(
-                            fc3[:, i, j, k, l, m]) / fc3.shape[0]
-                    elif index == 1:
-                        fc3[j, :, i, k, l, m] -= np.sum(
-                            fc3[j, :, i, k, l, m]) / fc3.shape[1]
-                    elif index == 2:
-                        fc3[i, j, :, k, l, m] -= np.sum(
-                            fc3[i, j, :, k, l, m]) / fc3.shape[2]
+                                     translational_symmetry_type=3):
+    _set_translational_invariance_fc3(
+        fc3,
+        translational_symmetry_type=translational_symmetry_type)
 
 def third_rank_tensor_rotation(rot_cart, tensor):
     rot_tensor = np.zeros((3,3,3), dtype='double')
@@ -366,16 +328,14 @@ def get_constrained_fc2(supercell,
                                         dtype='double'),
                                symprec)
 
+    if is_permutation_symmetry:
+        set_permutation_symmetry(fc2)
     if translational_symmetry_type:
         set_translational_invariance(
             fc2,
             translational_symmetry_type=translational_symmetry_type)
 
-    if is_permutation_symmetry:
-        set_permutation_symmetry(fc2)
-
     return fc2
-
 
 def solve_fc3(fc3,
               first_atom_num,
@@ -510,11 +470,11 @@ def show_drift_fc3(fc3, name="fc3"):
             maxval3 = val3
             klm3 = [k, l, m]
     text = "max drift of %s: " % name
-    text += "%f (%s%s%s) " % (maxval1,
+    text += "%e (%s%s%s) " % (maxval1,
                               "xyz"[klm1[0]], "xyz"[klm1[1]], "xyz"[klm1[2]])
-    text += "%f (%s%s%s) " % (maxval2,
+    text += "%e (%s%s%s) " % (maxval2,
                               "xyz"[klm2[0]], "xyz"[klm2[1]], "xyz"[klm2[2]])
-    text += "%f (%s%s%s)" % (maxval3,
+    text += "%e (%s%s%s)" % (maxval3,
                              "xyz"[klm3[0]], "xyz"[klm3[1]], "xyz"[klm3[2]])
     print(text)
 
@@ -652,3 +612,19 @@ def _get_fc3_done(supercell, disp_dataset, symmetry):
                 fc3_done[rotated_atom1, atom_mapping[i][j]] = 1
 
     return fc3_done
+
+def _set_translational_invariance_fc3(fc3,
+                                      translational_symmetry_type=1):
+    if translational_symmetry_type in (1, 2):
+        fc_sums = [fc3.sum(axis=i) / fc3.shape[i] for i in range(3)]
+        for i, j, k in list(np.ndindex(fc3.shape[:3])):
+            ave = (fc_sums[0][j, k] + fc_sums[1][i, k] + fc_sums[2][i, j]) / 3
+            fc3[i, j, k] -= ave
+    else: # 'else' is considerted as the default behaviour.
+        # assume fc is symmetric.
+        fc_sums = [fc3.sum(axis=i) / fc3.shape[i] for i in range(3)]
+
+            fc_sum = np.sum(fc3[:, i, j, k, l, m])
+            fc_diag = fc_sum - fc3[i, i, j, k, l, m]
+            fc3[i, i, j, k, l, m] = - fc_diag
+

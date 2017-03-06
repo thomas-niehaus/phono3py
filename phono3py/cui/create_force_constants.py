@@ -60,9 +60,9 @@ def create_phono3py_force_constants(phono3py,
     symmetrize_fc3_q = settings.get_is_symmetrize_fc3_q()
     symmetrize_fc2 = settings.get_is_symmetrize_fc2()
     if settings.get_is_translational_symmetry():
-        tsym_type = 1
-    elif settings.get_tsym_type() > 0:
-        tsym_type = settings.get_tsym_type()
+        tsym_type = 3
+        if settings.get_tsym_type() > 0:
+            tsym_type = settings.get_tsym_type()
     else:
         tsym_type = 0
 

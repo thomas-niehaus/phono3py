@@ -117,6 +117,7 @@ def show_phono3py_force_constants_settings(read_fc3,
     if not read_fc2:
         print("Imposing translational symmetry to fc2: %s" % 
               (tsym_type > 0))
+        print("Translational symmetry type: %d" % tsym_type)
         print("Imposing symmetry of index exchange to fc2: %s" %
               is_symmetrize_fc2)
 

@@ -230,7 +230,7 @@ class Phono3py(object):
             if is_permutation_symmetry:
                 set_permutation_symmetry(self._fc2)
             if is_translational_symmetry:
-                tsym_type = 1
+                tsym_type = 3
             else:
                 tsym_type = 0
             if translational_symmetry_type:
@@ -702,7 +702,6 @@ class Phono3py(object):
         fc2 = get_fc2(self._supercell, self._symmetry, disp_dataset)
         if is_permutation_symmetry_fc2:
             set_permutation_symmetry(fc2)
-
         if is_translational_symmetry:
             tsym_type = 1
         else:
