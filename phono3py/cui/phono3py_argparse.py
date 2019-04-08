@@ -56,6 +56,7 @@ def get_parser():
                         cutoff_pair_distance=None,
                         delta_fc2=False,
                         delta_fc2_sets_mode=False,
+                        dftbp_mode=False,
                         displacement_distance=None,
                         fc_symmetry=False,
                         force_sets_to_forces_fc2_mode=None,
@@ -230,6 +231,9 @@ def get_parser():
     parser.add_argument(
         "-d", "--disp", dest="is_displacement", action="store_true",
         help="As first stage, get least displacements")
+    parser.add_argument(
+        "--dftb+", dest="dftbp_mode", action="store_true",
+        help="Invoke DFTB+ mode")
     parser.add_argument(
         "--dim", nargs='+', dest="supercell_dimension",
         help="Supercell dimension")

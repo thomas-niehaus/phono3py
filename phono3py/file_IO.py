@@ -1,6 +1,9 @@
 import os
 import numpy as np
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 import h5py
+warnings.resetwarnings()
 
 from phonopy.file_IO import (write_force_constants_to_hdf5,
                              read_force_constants_hdf5,

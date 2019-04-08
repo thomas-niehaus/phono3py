@@ -394,6 +394,9 @@ if __name__ == '__main__':
         '--abinit', dest="abinit_mode",
         action="store_true", help="Invoke Abinit mode")
     parser.add_argument(
+        '--dftb+', dest="dftbp_mode",
+        action="store_true", help="Invoke DFTB+ mode")
+    parser.add_argument(
         "--noks", "--no-kappa-stars",
         dest="no_kappa_stars", action="store_true",
         help="Deactivate summation of partial kappa at q-stars")

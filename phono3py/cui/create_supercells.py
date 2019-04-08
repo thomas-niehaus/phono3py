@@ -51,9 +51,9 @@ def create_phono3py_supercells(unitcell,
                                output_filename=None,
                                log_level=1):
     if displacement_distance is None:
-        if interface_mode in ('qe', 'abinit'):
+        if interface_mode in ('qe', 'abinit', 'dftbp'):
             distance = 0.06
-        elif interface_mode == 'crystal':
+        elif interface_mode in ('crystal'):
             distance = 0.03
         else:
             distance = 0.03
@@ -104,6 +104,9 @@ def create_phono3py_supercells(unitcell,
         write_supercells_with_displacements(supercell,
                                             cells_with_disps,
                                             width=5)
+    elif interface_mode == 'dftbp':
+        write_supercells_with_displacements(supercell,
+                                            cells_with_disps)
     else: # VASP
         write_supercells_with_displacements(supercell,
                                             cells_with_disps,
@@ -150,6 +153,10 @@ def create_phono3py_supercells(unitcell,
                                                 cells_with_disps,
                                                 pre_filename="supercell_fc2",
                                                 width=5)
+        elif interface_mode == 'dftbp':
+            write_supercells_with_displacements(phonon_supercell,
+                                                cells_with_disps,
+                                                pre_filename="supercell_fc2")
         else:
             write_supercells_with_displacements(phonon_supercell,
                                                 cells_with_disps,

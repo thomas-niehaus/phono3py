@@ -113,6 +113,12 @@ if options.pwscf_mode:
                                          parse_set_of_forces)
     energy_to_eV = Rydberg
     distance_to_A = Bohr
+elif options.dftb_mode: 
+    interface_mode = 'dftbp'
+    from phonopy.interface.dftbp import (write_supercells_with_displacements,
+                                         parse_set_of_forces)
+    energy_to_eV = Hartree
+    distance_to_A = Bohr
 else:
     interface_mode = 'vasp'
     from phonopy.interface.vasp import (write_supercells_with_displacements,
